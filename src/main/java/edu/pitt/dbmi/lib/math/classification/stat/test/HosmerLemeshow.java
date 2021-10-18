@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 
 /**
+ * Hosmer-Lemeshow goodness of fit test. This implementation follows the Stata
+ * implementation: https://www.sealedenvelope.com/stata/hl/.
  *
  * Mar 2, 2011 4:44:13 PM (revised on Oct 17, 2021 5:53:30 PM)
  *
@@ -14,8 +16,8 @@ import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 public class HosmerLemeshow {
 
     public static enum DataGroupType {
-        DECILE_GROUPS,
-        RISK_GROUPS
+        DECILE_GROUPS, // ten equally sized groups
+        RISK_GROUPS //  groups 0 - 0.1, 0.1 - 0.2, ..., 0.9 - 1
     };
 
     private final int NUM_OF_INTERVAL = 10;  // break the data into 10 intervals
@@ -58,6 +60,9 @@ public class HosmerLemeshow {
         pValue = computePValue(degreeOfFreedom, hlChi2PerGroup);
     }
 
+    /**
+     * Compute by separating the data into ten equally sized groups.
+     */
     private void computeUsingDecileGroup() {
         int totalGroup = computeActualHlSummaryPointsInDecialGroup(probValues);
         hlPoints = new double[totalGroup][2];
@@ -132,6 +137,10 @@ public class HosmerLemeshow {
         degreeOfFreedom = groups.length - 2;
     }
 
+    /**
+     * Compute by separating the data into risk groups 0 - 0.1, 0.1 - 0.2, ...,
+     * 0.9 - 1.
+     */
     private void computeUsingRiskGroup() {
         int totalGroup = computeActualHlSummaryPointsInRiskGroup(probValues);
         groups = new int[totalGroup];
