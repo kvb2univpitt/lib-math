@@ -1,0 +1,168 @@
+/*
+ * Copyright (C) 2023 University of Pittsburgh.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+package edu.pitt.dbmi.lib.math.classification.roc;
+
+import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * ROC Curve using empirical method.
+ *
+ * Mar 27, 2012 8:49:05 AM
+ *
+ * @author Kevin V. Bui (kvb2univpitt@gmail.com)
+ */
+public class ROCCurve implements ROC {
+
+    /**
+     * Sensitivity, the y-values on the ROC plot.
+     */
+    private double[] truePositiveRates;
+
+    /**
+     * 1 - Specificity, the x-values on the ROC plot.
+     */
+    private double[] falsePositiveRates;
+
+    private ConfusionMatrix[] confusionMatrices;
+
+    private int numberOfPositives;
+
+    private int numberOfNegatives;
+
+    private double areaUnderRocCurve;
+
+    public ROCCurve(ObservedPredictedValue[] observedPredictedValues) {
+        if (observedPredictedValues == null || observedPredictedValues.length == 0) {
+            throw new IllegalArgumentException("Observed values and predicted values are required.");
+        }
+
+        // copy the array
+        observedPredictedValues = Arrays.stream(observedPredictedValues)
+                .toArray(ObservedPredictedValue[]::new);
+
+        // sort in descending order
+        Arrays.sort(observedPredictedValues, Collections.reverseOrder());
+
+        this.numberOfPositives = (int) Arrays.stream(observedPredictedValues)
+                .mapToInt(obsPredVal -> obsPredVal.getObservedValue())
+                .filter(observedValue -> observedValue == 1)
+                .count();
+        this.numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
+                .mapToInt(obsPredVal -> obsPredVal.getObservedValue())
+                .filter(observedValue -> observedValue == 0)
+                .count();
+
+        this.confusionMatrices = computeConfusionMatrices(observedPredictedValues, numberOfPositives, numberOfNegatives);
+
+        this.areaUnderRocCurve = computeAreaUnderRocCurve(confusionMatrices);
+
+        this.truePositiveRates = Arrays.stream(confusionMatrices)
+                .mapToDouble(confusionMaxtrice -> confusionMaxtrice.getTruePositiveRate())
+                .toArray();
+        this.falsePositiveRates = Arrays.stream(confusionMatrices)
+                .mapToDouble(confusionMaxtrice -> confusionMaxtrice.getFalsePositiveRate())
+                .toArray();
+    }
+
+    private double computeAreaUnderRocCurve(ConfusionMatrix[] confusionMatrices) {
+        double areaUnderCurve = 0;
+
+        double x1, x2, y1, y2;
+        x1 = y1 = 0;
+        for (ConfusionMatrix confusionMatrix : confusionMatrices) {
+            x2 = confusionMatrix.getFalsePositiveRate();
+            y2 = confusionMatrix.getTruePositiveRate();
+
+            // compute the area using trapezoid method
+            double base = Math.abs(x1 - x2);
+            double height = (y1 + y2) / 2;
+            areaUnderCurve += base * height;
+
+            x1 = x2;
+            y1 = y2;
+        }
+
+        return areaUnderCurve;
+    }
+
+    private ConfusionMatrix[] computeConfusionMatrices(ObservedPredictedValue[] observedPredictedValues, int numberOfPositives, int numberOfNegatives) {
+        List<ConfusionMatrix> confusionMatrixList = new LinkedList<>();
+
+        int falsePositive = 0;  // incorrectly labeled as belonging to the positive class (also known as false alarm, Type I error)
+        int truePositive = 0;  // the number of items correctly labeled as belonging to the positive class
+        int trueNegative = numberOfNegatives;
+        int falseNegative = numberOfPositives;  // items which were not labeled as belonging to the positive class but should have been (also known as miss, Type II error)
+        double threshold = -1.0;
+        for (ObservedPredictedValue observedPredictedValue : observedPredictedValues) {
+            if (observedPredictedValue.getPredictedValue() != threshold) {
+                confusionMatrixList.add(
+                        new ConfusionMatrix(falseNegative, falsePositive, trueNegative, truePositive, threshold));
+                threshold = observedPredictedValue.getPredictedValue();
+            }
+
+            if (observedPredictedValue.getObservedValue() == 1) {
+                truePositive++;
+                falseNegative--;
+            } else {
+                falsePositive++;
+                trueNegative--;
+            }
+        }
+        confusionMatrixList.add(
+                new ConfusionMatrix(falseNegative, falsePositive, trueNegative, truePositive, threshold));
+
+        return confusionMatrixList.stream()
+                .toArray(ConfusionMatrix[]::new);
+    }
+
+    @Override
+    public double[] getTruePositiveRates() {
+        return truePositiveRates;
+    }
+
+    @Override
+    public double[] getFalsePositiveRates() {
+        return falsePositiveRates;
+    }
+
+    @Override
+    public ConfusionMatrix[] getConfusionMatrices() {
+        return confusionMatrices;
+    }
+
+    @Override
+    public int getNumberOfPositives() {
+        return numberOfPositives;
+    }
+
+    @Override
+    public int getNumberOfNegatives() {
+        return numberOfNegatives;
+    }
+
+    @Override
+    public double getAreaUnderRocCurve() {
+        return areaUnderRocCurve;
+    }
+
+}
