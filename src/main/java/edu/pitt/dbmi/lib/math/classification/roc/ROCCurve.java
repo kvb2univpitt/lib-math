@@ -43,6 +43,10 @@ public class ROCCurve implements ROC {
      */
     private double[] falsePositiveRates;
 
+    private double[] positivePredictedValues;
+
+    private double[] negativePredictedValues;
+
     private ConfusionMatrix[] confusionMatrices;
 
     private int numberOfPositives;
@@ -69,6 +73,16 @@ public class ROCCurve implements ROC {
         this.numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .count();
+
+        // seperate the values for the positive and negative outcomes
+        positivePredictedValues = Arrays.stream(observedPredictedValues)
+                .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
+                .mapToDouble(obsPredVal -> obsPredVal.getPredictedValue())
+                .toArray();
+        negativePredictedValues = Arrays.stream(observedPredictedValues)
+                .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
+                .mapToDouble(obsPredVal -> obsPredVal.getPredictedValue())
+                .toArray();
 
         this.confusionMatrices = computeConfusionMatrices(observedPredictedValues, numberOfPositives, numberOfNegatives);
 
@@ -141,6 +155,16 @@ public class ROCCurve implements ROC {
     @Override
     public double[] getFalsePositiveRates() {
         return falsePositiveRates;
+    }
+
+    @Override
+    public double[] getPositivePredictedValues() {
+        return positivePredictedValues;
+    }
+
+    @Override
+    public double[] getNegativePredictedValues() {
+        return negativePredictedValues;
     }
 
     @Override

@@ -28,18 +28,13 @@ package edu.pitt.dbmi.lib.math.classification.roc;
 public interface ROC {
 
     /**
-     * Get the area under the ROC curve.
+     * When it's actually true, how often does it predict true?<br/>
+     * Also known as sensitivity, hit rate, recall.<br />
+     * The x-values on the AUROC plot.
      *
-     * @return area under the ROC curve
+     * @return true positive rate
      */
-    public double getAreaUnderRocCurve();
-
-    /**
-     * Get the confusion matrices calculated for each threshold.
-     *
-     * @return confusion matrices
-     */
-    public ConfusionMatrix[] getConfusionMatrices();
+    public double[] getTruePositiveRates();
 
     /**
      * When it's actually false, how often does it predict true?<br>
@@ -50,13 +45,32 @@ public interface ROC {
     public double[] getFalsePositiveRates();
 
     /**
-     * When it's actually true, how often does it predict true?<br/>
-     * Also known as sensitivity, hit rate, recall.<br />
-     * The x-values on the AUROC plot.
+     * Predicted values for positive cases.
      *
-     * @return true positive rate
+     * @return predicted values
      */
-    public double[] getTruePositiveRates();
+    public double[] getPositivePredictedValues();
+
+    /**
+     * Predicted values for negative cases.
+     *
+     * @return predicted values
+     */
+    public double[] getNegativePredictedValues();
+
+    /**
+     * Get the confusion matrices calculated for each threshold.
+     *
+     * @return confusion matrices
+     */
+    public ConfusionMatrix[] getConfusionMatrices();
+
+    /**
+     * Get number of positive cases.
+     *
+     * @return number of positive cases
+     */
+    public int getNumberOfPositives();
 
     /**
      * Get number of negative cases.
@@ -66,10 +80,10 @@ public interface ROC {
     public int getNumberOfNegatives();
 
     /**
-     * Get number of positive cases.
+     * Get the area under the ROC curve.
      *
-     * @return number of positive cases
+     * @return area under the ROC curve
      */
-    public int getNumberOfPositives();
+    public double getAreaUnderRocCurve();
 
 }
