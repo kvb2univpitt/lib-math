@@ -63,13 +63,11 @@ public class DeLongROCCurve implements ROC {
         // sort in descending order
         Arrays.sort(observedPredictedValues, Collections.reverseOrder());
 
-        numberOfPositives = (int) Arrays.stream(observedPredictedValues)
-                .mapToInt(obsPredVal -> obsPredVal.getObservedValue())
-                .filter(observedValue -> observedValue == 1)
+        this.numberOfPositives = (int) Arrays.stream(observedPredictedValues)
+                .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
                 .count();
-        numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
-                .mapToInt(obsPredVal -> obsPredVal.getObservedValue())
-                .filter(observedValue -> observedValue == 0)
+        this.numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
+                .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .count();
 
         truePositiveRates = new double[observedPredictedValues.length];

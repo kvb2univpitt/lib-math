@@ -64,12 +64,10 @@ public class ROCCurve implements ROC {
         Arrays.sort(observedPredictedValues, Collections.reverseOrder());
 
         this.numberOfPositives = (int) Arrays.stream(observedPredictedValues)
-                .mapToInt(obsPredVal -> obsPredVal.getObservedValue())
-                .filter(observedValue -> observedValue == 1)
+                .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
                 .count();
         this.numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
-                .mapToInt(obsPredVal -> obsPredVal.getObservedValue())
-                .filter(observedValue -> observedValue == 0)
+                .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .count();
 
         this.confusionMatrices = computeConfusionMatrices(observedPredictedValues, numberOfPositives, numberOfNegatives);
