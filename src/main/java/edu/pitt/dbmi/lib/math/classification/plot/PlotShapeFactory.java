@@ -44,7 +44,7 @@ public final class PlotShapeFactory {
     public static final String RIGHT_POINTING_TRIANGLE_SHAPE = "right-pointing triangle";
     public static final String LEFT_POINTING_TRIANGLE_SHAPE = "left-pointing triangle";
 
-    public static final Map<String, Shape> STANDARD_SHAPES = createShapes(6.0);
+    public static final Map<String, Shape> STANDARD_SHAPES = createShapes(12.0);
 
     private PlotShapeFactory() {
     }

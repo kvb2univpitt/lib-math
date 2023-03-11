@@ -122,6 +122,30 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
 
     @Override
     public String toString() {
+        return getSummary();
+    }
+
+    protected double computePValue(int degreesOfFreedom, double[] hlChi2PerGroup) {
+        double pvalue = -1.0;
+
+        if (degreesOfFreedom > 0) {
+            ChiSquaredDistribution distribution = new ChiSquaredDistribution(degreesOfFreedom);
+
+            double hlTotal = 0;
+            for (int i = 0; i < hlChi2PerGroup.length; i++) {
+                hlTotal += hlChi2PerGroup[i];
+            }
+
+            if (!Double.isInfinite(hlTotal)) {
+                pvalue = 1.0 - distribution.cumulativeProbability(hlTotal);
+            }
+        }
+
+        return pvalue;
+    }
+
+    @Override
+    public String getSummary() {
         if (summary == null) {
             StringBuilder dataBuilder = new StringBuilder("========================================================================\n");
             dataBuilder.append(String.format("%-6s %-8s %-13s %-15s %-8s 95%s CI\n", "Group", "N", "Obs (%)", "Exp (%)", "HL", "%"));
@@ -163,30 +187,6 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
             summary = dataBuilder.toString();
         }
 
-        return summary;
-    }
-
-    protected double computePValue(int degreesOfFreedom, double[] hlChi2PerGroup) {
-        double pvalue = -1.0;
-
-        if (degreesOfFreedom > 0) {
-            ChiSquaredDistribution distribution = new ChiSquaredDistribution(degreesOfFreedom);
-
-            double hlTotal = 0;
-            for (int i = 0; i < hlChi2PerGroup.length; i++) {
-                hlTotal += hlChi2PerGroup[i];
-            }
-
-            if (!Double.isInfinite(hlTotal)) {
-                pvalue = 1.0 - distribution.cumulativeProbability(hlTotal);
-            }
-        }
-
-        return pvalue;
-    }
-
-    @Override
-    public String getSummary() {
         return summary;
     }
 
