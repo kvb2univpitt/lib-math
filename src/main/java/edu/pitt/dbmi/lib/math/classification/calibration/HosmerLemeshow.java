@@ -60,4 +60,8 @@ public interface HosmerLemeshow {
 
     public double getExpectedCalibrationError();
 
+    public double getMaxCalibrationError();
+
+    public double getAverageCalibrationError();
+
 }

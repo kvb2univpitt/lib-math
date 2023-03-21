@@ -96,7 +96,20 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
 
     protected double pValue;
 
+    /**
+     * The measurement of the observed accuracy in each bin.
+     */
     protected double expectedCalibrationError;
+
+    /**
+     * The highest gap over all bins.
+     */
+    protected double maxCalibrationError;
+
+    /**
+     * The average miscalibration where each bin gets weighted equally.
+     */
+    protected double averageCalibrationError;
 
     public AbstractHosmerLemeshow(ObservedPredictedValue[] observedPredictedValues) {
         if (observedPredictedValues == null || observedPredictedValues.length == 0) {
@@ -146,18 +159,77 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
         return pvalue;
     }
 
+    /**
+     * The Expected Calibration Error (ECE) measures the observed accuracy in
+     * each group (bin).
+     *
+     * @param hlExpectedValues
+     * @param hlObservedValues
+     * @param numberOfDataPerGroup
+     * @param numberOfPredictions
+     * @return
+     */
     protected double computeExpectedCalibrationError(double[] hlExpectedValues, double[] hlObservedValues, int[] numberOfDataPerGroup, int numberOfPredictions) {
         double ece = 0;
 
         for (int i = 0; i < numberOfDataPerGroup.length; i++) {
-            double yValue = hlObservedValues[i];  // the true fraction of positive instances in bin i
-            double xValue = hlExpectedValues[i]; // the mean of the post-calibrated probabilities for the instances in bin i
+            double yValue = hlObservedValues[i];  // the true fraction of positive instances in bin i (accuracy of the data items in the bin)
+            double xValue = hlExpectedValues[i]; // the mean of the post-calibrated probabilities for the instances in bin i (average confidence)
             double iProb = ((double) numberOfDataPerGroup[i]) / numberOfPredictions;  // the empirical probability (fraction) of all instances that fall into bin i
 
             ece += iProb * Math.abs(yValue - xValue);
         }
 
         return ece;
+    }
+
+    /**
+     * The Maximum Calibration Error (MCE) denotes the highest gap over all
+     * groups (bins).
+     *
+     * @param hlExpectedValues
+     * @param hlObservedValues
+     * @param numberOfDataPerGroup
+     * @return
+     */
+    protected double computeMaxCalibrationError(double[] hlExpectedValues, double[] hlObservedValues, int[] numberOfDataPerGroup) {
+        double mce = 0;
+
+        for (int i = 0; i < numberOfDataPerGroup.length; i++) {
+            double yValue = hlObservedValues[i];  // the true fraction of positive instances in bin i (accuracy of the data items in the bin)
+            double xValue = hlExpectedValues[i]; // the mean of the post-calibrated probabilities for the instances in bin i (average confidence)
+
+            double diffSoreAccuracy = Math.abs(yValue - xValue);
+            if (mce < diffSoreAccuracy) {
+                mce = diffSoreAccuracy;
+            }
+
+        }
+
+        return mce;
+    }
+
+    /**
+     * Average Calibration Error (ACE) denotes the average miscalibration where
+     * each bin gets weighted equally.
+     *
+     * @param hlExpectedValues
+     * @param hlObservedValues
+     * @param numberOfDataPerGroup
+     * @return
+     */
+    protected double computeAverageCalibrationError(double[] hlExpectedValues, double[] hlObservedValues, int[] numberOfDataPerGroup) {
+        double ace = 0;
+
+        int numOfNonemptyBins = numberOfDataPerGroup.length;
+        for (int i = 0; i < numberOfDataPerGroup.length; i++) {
+            double yValue = hlObservedValues[i];  // the true fraction of positive instances in bin i (accuracy of the data items in the bin)
+            double xValue = hlExpectedValues[i]; // the mean of the post-calibrated probabilities for the instances in bin i (average confidence)
+
+            ace += Math.abs(yValue - xValue) / numOfNonemptyBins;
+        }
+
+        return ace;
     }
 
     @Override
@@ -198,7 +270,12 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
             dataBuilder.append(String.format("Hosmer-Lemeshow Chi2(%d): %1.2f\n", numOfGroup, hlTotal));
             dataBuilder.append(String.format("Degree of Freedom: %d\n", degreesOfFreedom));
             dataBuilder.append(String.format("P-Value: %f\n", pValue));
-            dataBuilder.append(String.format("Expected Calibration Error: %f\n", expectedCalibrationError));
+            dataBuilder.append("\n");
+            dataBuilder.append("Calibration Metrics\n");
+            dataBuilder.append("------------------------------------\n");
+            dataBuilder.append(String.format("Expected Calibration Error (ECE): %f\n", expectedCalibrationError));
+            dataBuilder.append(String.format("Maximum Calibration Error (MCE): %f\n", maxCalibrationError));
+            dataBuilder.append(String.format("Average Calibration Error (ACE) : %f\n", averageCalibrationError));
             dataBuilder.append("========================================================================");
 
             summary = dataBuilder.toString();
@@ -275,6 +352,16 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
     @Override
     public double getExpectedCalibrationError() {
         return expectedCalibrationError;
+    }
+
+    @Override
+    public double getMaxCalibrationError() {
+        return maxCalibrationError;
+    }
+
+    @Override
+    public double getAverageCalibrationError() {
+        return averageCalibrationError;
     }
 
 }
