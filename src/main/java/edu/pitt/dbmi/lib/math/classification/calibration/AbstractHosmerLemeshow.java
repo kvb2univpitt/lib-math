@@ -96,6 +96,8 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
 
     protected double pValue;
 
+    protected double expectedCalibrationError;
+
     public AbstractHosmerLemeshow(ObservedPredictedValue[] observedPredictedValues) {
         if (observedPredictedValues == null || observedPredictedValues.length == 0) {
             throw new IllegalArgumentException("Observed values and predicted values are required.");
@@ -144,6 +146,20 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
         return pvalue;
     }
 
+    protected double computeExpectedCalibrationError(double[] hlExpectedValues, double[] hlObservedValues, int[] numberOfDataPerGroup, int numberOfPredictions) {
+        double ece = 0;
+
+        for (int i = 0; i < numberOfDataPerGroup.length; i++) {
+            double yValue = hlObservedValues[i];  // the true fraction of positive instances in bin i
+            double xValue = hlExpectedValues[i]; // the mean of the post-calibrated probabilities for the instances in bin i
+            double iProb = ((double) numberOfDataPerGroup[i]) / numberOfPredictions;  // the empirical probability (fraction) of all instances that fall into bin i
+
+            ece += iProb * Math.abs(yValue - xValue);
+        }
+
+        return ece;
+    }
+
     @Override
     public String getSummary() {
         if (summary == null) {
@@ -182,6 +198,7 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
             dataBuilder.append(String.format("Hosmer-Lemeshow Chi2(%d): %1.2f\n", numOfGroup, hlTotal));
             dataBuilder.append(String.format("Degree of Freedom: %d\n", degreesOfFreedom));
             dataBuilder.append(String.format("P-Value: %f\n", pValue));
+            dataBuilder.append(String.format("Expected Calibration Error: %f\n", expectedCalibrationError));
             dataBuilder.append("========================================================================");
 
             summary = dataBuilder.toString();
@@ -253,6 +270,11 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
     @Override
     public double getPValue() {
         return pValue;
+    }
+
+    @Override
+    public double getExpectedCalibrationError() {
+        return expectedCalibrationError;
     }
 
 }

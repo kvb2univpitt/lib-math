@@ -94,6 +94,7 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
         degreesOfFreedom = groups.length - 2;
 
         pValue = computePValue(degreesOfFreedom, hlChi2PerGroup);
+        expectedCalibrationError = computeExpectedCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup, numberOfPredictions);
     }
 
     /**
