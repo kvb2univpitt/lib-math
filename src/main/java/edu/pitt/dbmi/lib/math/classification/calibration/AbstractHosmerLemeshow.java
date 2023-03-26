@@ -133,12 +133,32 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
             observedValues[i] = obsPredVal.getObservedValue();
             predictedValues[i] = obsPredVal.getPredictedValue();
         }
+
+        int totalNumOfGroups = computeTotalNumberOfGroups();
+        groups = new int[totalNumOfGroups];
+        numberOfDataPerGroup = new int[totalNumOfGroups];
+        positiveObservedSumPerGroup = new int[totalNumOfGroups];
+        predictedSumPerGroup = new double[totalNumOfGroups];
+        hlChi2PerGroup = new double[totalNumOfGroups];
+        marginOfErrorPerGroup = new double[totalNumOfGroups];
+        hlObservedValues = new double[totalNumOfGroups];
+        hlExpectedValues = new double[totalNumOfGroups];
+
+        computePlotPoints();
+
+        degreesOfFreedom = groups.length - 2;
+
+        pValue = computePValue(degreesOfFreedom, hlChi2PerGroup);
+
+        // calibration metrics
+        expectedCalibrationError = computeExpectedCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup, numberOfPredictions);
+        maxCalibrationError = computeMaxCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup);
+        averageCalibrationError = computeAverageCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup);
     }
 
-    @Override
-    public String toString() {
-        return getSummary();
-    }
+    protected abstract int computeTotalNumberOfGroups();
+
+    protected abstract void computePlotPoints();
 
     protected double computePValue(int degreesOfFreedom, double[] hlChi2PerGroup) {
         double pvalue = -1.0;
@@ -282,6 +302,11 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
         }
 
         return summary;
+    }
+
+    @Override
+    public String toString() {
+        return getSummary();
     }
 
     @Override

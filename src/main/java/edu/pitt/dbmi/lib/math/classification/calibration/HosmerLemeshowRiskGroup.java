@@ -30,17 +30,10 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
 
     public HosmerLemeshowRiskGroup(ObservedPredictedValue[] observedPredictedValues) {
         super(observedPredictedValues);
+    }
 
-        int totalNumOfGroups = computeTotalNumberOfGroups();
-        groups = new int[totalNumOfGroups];
-        numberOfDataPerGroup = new int[totalNumOfGroups];
-        positiveObservedSumPerGroup = new int[totalNumOfGroups];
-        predictedSumPerGroup = new double[totalNumOfGroups];
-        hlChi2PerGroup = new double[totalNumOfGroups];
-        marginOfErrorPerGroup = new double[totalNumOfGroups];
-        hlObservedValues = new double[totalNumOfGroups];
-        hlExpectedValues = new double[totalNumOfGroups];
-
+    @Override
+    protected void computePlotPoints() {
         int groupIndex = 0;
         int groupNumber = 1;
 
@@ -90,15 +83,6 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             groupNumber++;
             threshold += thresdholdIncrement;
         }
-
-        degreesOfFreedom = groups.length - 2;
-
-        pValue = computePValue(degreesOfFreedom, hlChi2PerGroup);
-
-        // calibration metrics
-        expectedCalibrationError = computeExpectedCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup, numberOfPredictions);
-        maxCalibrationError = computeMaxCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup);
-        averageCalibrationError = computeAverageCalibrationError(hlExpectedValues, hlObservedValues, numberOfDataPerGroup);
     }
 
     /**
@@ -107,7 +91,8 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
      *
      * @return number of groups with at least one member
      */
-    private int computeTotalNumberOfGroups() {
+    @Override
+    protected int computeTotalNumberOfGroups() {
         int totalGroup = 0;
 
         double increment = 1.0 / NUM_OF_INTERVAL;
