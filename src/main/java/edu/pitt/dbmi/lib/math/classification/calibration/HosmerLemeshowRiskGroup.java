@@ -21,6 +21,7 @@ package edu.pitt.dbmi.lib.math.classification.calibration;
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
 
 /**
+ * Hosmer-Lemeshow calibration chart binning by risk-factor.
  *
  * Mar 30, 2012 1:35:07 PM
  *
@@ -42,12 +43,10 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
         int size = predictedValues.length;
         int index = 0;
         while (index < size) {
-            // sum up all the predictions and tally number of positive in the interval
+            // if the data falls within current threshold (bin), sum up all the predictions and tally number of positive in the interval
             double predictedValueSum = 0;  // expected number of cases in the jth group (sum of predictions within the interval)
             int numOfData = 0;  // total number of data within the interval
             int numOfPosObserVal = 0;  // observed number of cases in the jth group
-
-            // check if the data falls within current threshold (bin)
             if (predictedValues[index] < threshold) {
                 numOfData++;  // number of observations in the jth group
                 predictedValueSum += predictedValues[index];
@@ -68,7 +67,7 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
                 }
             }
 
-            // compute chart points if there is in the bin
+            // compute chart points if there is data in the bin
             if (numOfData > 0) {
                 double xValue = predictedValueSum / numOfData;  // average of the predicted values within the interval
                 double yValue = ((double) numOfPosObserVal) / numOfData;  // # positive divided by (# positive + # negative) with in the interval

@@ -21,8 +21,8 @@ package edu.pitt.dbmi.lib.math.classification.calibration;
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
 
 /**
- * Compute Hosmer-Lemeshow using decile grouping, split the dataset into 10
- * equal parts.
+ * Hosmer-Lemeshow calibration chart binning by decile, splitting the dataset
+ * into 10 equal parts.
  *
  * Mar 30, 2012 11:43:49 AM
  *
@@ -44,37 +44,37 @@ public class HosmerLemeshowDecileGroup extends AbstractHosmerLemeshow {
         int index = 0;
         while (index < size) {
             // compute the threshold
-            double threshold;
             int intUpperIndex = (int) (percent * size);
-            if (intUpperIndex >= size) {
-                threshold = predictedValues[size - 1];
-            } else {
-                threshold = predictedValues[intUpperIndex];
-            }
+            double threshold = (intUpperIndex < size)
+                    ? predictedValues[intUpperIndex]
+                    : predictedValues[size - 1];
 
-            // for each interval, sum up all the predictions and tally number of positive
+            // if the data falls within current threshold (bin), sum up all the predictions and tally number of positive
             double predictedValueSum = 0.0;  // sum of predicted values within the interval
             int numOfData = 0;  // total number of data within the interval
             int numOfPosObserVal = 0;
-            double value = predictedValues[index];
-            while (value <= threshold) {
-                numOfData++;
+            if (predictedValues[index] <= threshold) {
+                numOfData++;  // number of observations in the jth group
                 predictedValueSum += predictedValues[index];
-
                 if (observedValues[index] == 1) {
                     numOfPosObserVal++;
                 }
 
-                // check to make sure we have more data to work with before moving on
+                // continue to tally the data that falls in the current threshold (bin)
                 index++;
-                if (index < size) {
-                    value = predictedValues[index];
-                } else {
-                    break;
+                for (int j = index; j < predictedValues.length && (predictedValues[j] <= threshold); j++) {
+                    numOfData++;  // number of observations in the jth group
+                    predictedValueSum += predictedValues[index];
+                    if (observedValues[index] == 1) {
+                        numOfPosObserVal++;
+                    }
+
+                    index++;
                 }
             }
 
-            if (numOfData != 0) {
+            // compute chart points if there is data in the bin
+            if (numOfData > 0) {
                 double xValue = predictedValueSum / numOfData;  // average of the predicted values within the interval
                 double yValue = ((double) numOfPosObserVal) / numOfData;  // # positive divided by (# positive + # negative) with in the interval
 
@@ -96,52 +96,40 @@ public class HosmerLemeshowDecileGroup extends AbstractHosmerLemeshow {
     }
 
     /**
-     * Split into 10 equal groups and count how many of groups has at least one
+     * Split groups into intervals and count how many of groups has at least one
      * member.
      *
      * @return number of groups with at least one member
      */
     @Override
     protected int computeTotalNumberOfGroups() {
-        int totalGroup = 0;
+        int numOfGroups = 0;
 
-        double percent = 0.10;
+        double percent = 0.10d;
         int size = predictedValues.length;
         int index = 0;
         while (index < size) {
             // compute the threshold
-            double threshold;
             int intUpperIndex = (int) (percent * size);
-            if (intUpperIndex >= size) {
-                threshold = predictedValues[size - 1];
-            } else {
-                threshold = predictedValues[intUpperIndex];
-            }
+            double threshold = (intUpperIndex < size)
+                    ? predictedValues[intUpperIndex]
+                    : predictedValues[size - 1];
 
-            // for each interval, make sure we have data in each group (interval)
-            boolean hasDataInInterval = false;
-            double value = predictedValues[index];
-            while (value <= threshold) {
-                hasDataInInterval = true;
+            // check if the data falls within current threshold (bin)
+            if (predictedValues[index] <= threshold) {
+                numOfGroups++;
 
-                // check to make sure we have more data to work with before moving on
+                // skip all the data that already falls in the current threshold (bin)
                 index++;
-                if (index < size) {
-                    value = predictedValues[index];
-                } else {
-                    break;
+                for (int j = index; j < predictedValues.length && (predictedValues[j] <= threshold); j++) {
+                    index++;
                 }
-            }
-
-            // count only if there's data in the group
-            if (hasDataInInterval) {
-                totalGroup++;
             }
 
             percent += 0.10;
         }
 
-        return totalGroup;
+        return numOfGroups;
     }
 
 }
