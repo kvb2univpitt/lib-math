@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
  */
 public class HosmerLemeshowRiskGroupTest {
 
-    private static HosmerLemeshowRiskGroup hlCalibration;
+    private static HosmerLemeshowRiskGroup hlstat;
 
     @BeforeAll
     public static void setUpClass() throws IOException {
@@ -46,7 +46,7 @@ public class HosmerLemeshowRiskGroupTest {
         Pattern delimiter = Delimiters.COMMA;
         ObservedPredictedValue[] observedPredictedValues = ResourcesLoader.loadObservedPredictedValues(file, delimiter);
 
-        hlCalibration = new HosmerLemeshowRiskGroup(observedPredictedValues);
+        hlstat = new HosmerLemeshowRiskGroup(observedPredictedValues);
     }
 
     /**
@@ -54,7 +54,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testToString() {
-        Assertions.assertNotNull(hlCalibration.toString());
+        Assertions.assertNotNull(hlstat.toString());
     }
 
     /**
@@ -62,7 +62,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetSummary() {
-        Assertions.assertNotNull(hlCalibration.toString());
+        Assertions.assertNotNull(hlstat.toString());
     }
 
     /**
@@ -70,7 +70,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetNumberOfPredictions() {
-        int result = hlCalibration.getNumberOfPredictions();
+        int result = hlstat.getNumberOfPredictions();
         int expResult = 1411;
 
         Assertions.assertEquals(expResult, result);
@@ -81,7 +81,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetObservedValues() {
-        int result = hlCalibration.getObservedValues().length;
+        int result = hlstat.getObservedValues().length;
         int expResult = 1411;
 
         Assertions.assertEquals(expResult, result);
@@ -92,7 +92,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetPredictedValues() {
-        int result = hlCalibration.getPredictedValues().length;
+        int result = hlstat.getPredictedValues().length;
         int expResult = 1411;
 
         Assertions.assertEquals(expResult, result);
@@ -103,7 +103,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetGroups() {
-        int result = hlCalibration.getGroups().length;
+        int result = hlstat.getGroups().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -114,7 +114,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetNumberOfDataPerGroup() {
-        int result = hlCalibration.getNumberOfDataPerGroup().length;
+        int result = hlstat.getNumberOfDataPerGroup().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -126,7 +126,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetPositiveObservedSumPerGroup() {
-        int result = hlCalibration.getPositiveObservedSumPerGroup().length;
+        int result = hlstat.getPositiveObservedSumPerGroup().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -137,7 +137,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetPredictedSumPerGroup() {
-        int result = hlCalibration.getPredictedSumPerGroup().length;
+        int result = hlstat.getPredictedSumPerGroup().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -148,7 +148,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetHlChi2PerGroup() {
-        int result = hlCalibration.getHlChi2PerGroup().length;
+        int result = hlstat.getHlChi2PerGroup().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -159,7 +159,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetMarginOfErrorPerGroup() {
-        int result = hlCalibration.getMarginOfErrorPerGroup().length;
+        int result = hlstat.getMarginOfErrorPerGroup().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -170,7 +170,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetHlObservedValues() {
-        int result = hlCalibration.getHlObservedValues().length;
+        int result = hlstat.getHlObservedValues().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -181,7 +181,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetHlExpectedValues() {
-        int result = hlCalibration.getHlExpectedValues().length;
+        int result = hlstat.getHlExpectedValues().length;
         int expResult = 9;
 
         Assertions.assertEquals(expResult, result);
@@ -192,7 +192,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetDegreesOfFreedom() {
-        int result = hlCalibration.getDegreesOfFreedom();
+        int result = hlstat.getDegreesOfFreedom();
         int expResult = 7;
 
         Assertions.assertEquals(expResult, result);
@@ -203,7 +203,7 @@ public class HosmerLemeshowRiskGroupTest {
      */
     @Test
     public void testGetPValue() {
-        double result = hlCalibration.getPValue();
+        double result = hlstat.getPValue();
         double expResult = 0;
 
         Assertions.assertEquals(expResult, result);

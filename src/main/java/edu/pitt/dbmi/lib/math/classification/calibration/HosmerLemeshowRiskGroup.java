@@ -37,8 +37,8 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
         int groupIndex = 0;
         int groupNumber = 1;
 
-        double thresdholdIncrement = 1.0 / NUM_OF_INTERVAL;
-        double threshold = thresdholdIncrement;
+        double increment = 1.0 / NUM_OF_INTERVAL;
+        double threshold = increment;
         int size = predictedValues.length;
         int index = 0;
         while (index < size) {
@@ -46,25 +46,30 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             double predictedValueSum = 0;  // expected number of cases in the jth group (sum of predictions within the interval)
             int numOfData = 0;  // total number of data within the interval
             int numOfPosObserVal = 0;  // observed number of cases in the jth group
-            double value = predictedValues[index];
-            while (value < threshold) {
+
+            // check if the data falls within current threshold (bin)
+            if (predictedValues[index] < threshold) {
                 numOfData++;  // number of observations in the jth group
                 predictedValueSum += predictedValues[index];
-
                 if (observedValues[index] == 1) {
                     numOfPosObserVal++;
                 }
 
-                // check to make sure we have more data to work with before moving on
+                // continue to tally the data that falls in the current threshold (bin)
                 index++;
-                if (index < size) {
-                    value = predictedValues[index];
-                } else {
-                    break;
+                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold); j++) {
+                    numOfData++;  // number of observations in the jth group
+                    predictedValueSum += predictedValues[index];
+                    if (observedValues[index] == 1) {
+                        numOfPosObserVal++;
+                    }
+
+                    index++;
                 }
             }
 
-            if (numOfData != 0) {
+            // compute chart points if there is in the bin
+            if (numOfData > 0) {
                 double xValue = predictedValueSum / numOfData;  // average of the predicted values within the interval
                 double yValue = ((double) numOfPosObserVal) / numOfData;  // # positive divided by (# positive + # negative) with in the interval
 
@@ -81,7 +86,7 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             }
 
             groupNumber++;
-            threshold += thresdholdIncrement;
+            threshold += increment;
         }
     }
 
@@ -93,36 +98,28 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
      */
     @Override
     protected int computeTotalNumberOfGroups() {
-        int totalGroup = 0;
+        int numOfGroups = 0;
 
         double increment = 1.0 / NUM_OF_INTERVAL;
         double threshold = increment;
         int size = predictedValues.length;
         int index = 0;
         while (index < size) {
-            double value = predictedValues[index];
-            boolean hasDataInInterval = false;
-            while (value < threshold) {
-                hasDataInInterval = true;
+            // check if the data falls within current threshold (bin)
+            if (predictedValues[index] < threshold) {
+                numOfGroups++;
 
-                // check to make sure we have more data to work with before moving on
+                // skip all the data that already falls in the current threshold (bin)
                 index++;
-                if (index < size) {
-                    value = predictedValues[index];
-                } else {
-                    break;
+                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold); j++) {
+                    index++;
                 }
-            }
-
-            // count only if there's data in the group
-            if (hasDataInInterval) {
-                totalGroup++;
             }
 
             threshold += increment;
         }
 
-        return totalGroup;
+        return numOfGroups;
     }
 
 }
