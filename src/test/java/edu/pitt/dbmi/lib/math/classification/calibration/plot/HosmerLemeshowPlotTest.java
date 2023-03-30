@@ -50,7 +50,7 @@ public class HosmerLemeshowPlotTest {
      */
     @Test
     public void testSaveImageAsPNG() throws Exception {
-        Path dataFile = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.txt").getFile());
+        Path dataFile = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.csv").getFile());
         Pattern delimiter = Delimiters.COMMA;
         ObservedPredictedValue[] observedPredictedValues = ResourcesLoader.loadObservedPredictedValues(dataFile, delimiter);
         HosmerLemeshow hl = new HosmerLemeshowRiskGroup(observedPredictedValues);

@@ -42,7 +42,7 @@ public class HosmerLemeshowDecileGroupTest {
 
     @BeforeAll
     public static void setUpClass() throws IOException {
-        Path file = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.txt").getFile());
+        Path file = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.csv").getFile());
         Pattern delimiter = Delimiters.COMMA;
         ObservedPredictedValue[] observedPredictedValues = ResourcesLoader.loadObservedPredictedValues(file, delimiter);
 

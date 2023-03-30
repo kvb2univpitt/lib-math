@@ -39,7 +39,7 @@ public class ResourcesLoaderTest {
      */
     @Test
     public void testLoadObservedPredictedValues() throws Exception {
-        Path file = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.txt").getFile());
+        Path file = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.csv").getFile());
         Pattern delimiter = Delimiters.COMMA;
 
         ObservedPredictedValue[] values = ResourcesLoader.loadObservedPredictedValues(file, delimiter);

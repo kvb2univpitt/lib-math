@@ -56,7 +56,7 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
 
                 // continue to tally the data that falls in the current threshold (bin)
                 index++;
-                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold); j++) {
+                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold || threshold > 0.9); j++) {
                     numOfData++;  // number of observations in the jth group
                     predictedValueSum += predictedValues[index];
                     if (observedValues[index] == 1) {
@@ -107,10 +107,9 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             // check if the data falls within current threshold (bin)
             if (predictedValues[index] < threshold) {
                 numOfGroups++;
-
                 // skip all the data that already falls in the current threshold (bin)
                 index++;
-                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold); j++) {
+                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold || threshold > 0.9); j++) {
                     index++;
                 }
             }
