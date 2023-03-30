@@ -107,6 +107,7 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             // check if the data falls within current threshold (bin)
             if (predictedValues[index] < threshold) {
                 numOfGroups++;
+
                 // skip all the data that already falls in the current threshold (bin)
                 index++;
                 for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold || threshold > 0.9); j++) {
