@@ -113,7 +113,7 @@ public class DeLongROCCurve implements ROC {
             int falseNegative = numberOfPositives - truePositive;
             int trueNegative = (int) (specificity * numberOfNegatives);
             int falsePositive = numberOfNegatives - trueNegative;
-            confusionMatrixList.add(new ConfusionMatrix(falseNegative, falsePositive, trueNegative, truePositive, z));
+            confusionMatrixList.add(new ConfusionMatrix(truePositive, trueNegative, falsePositive, falseNegative, z));
 
             truePositiveRates[index] = sensitivity;
             falsePositiveRates[index] = 1 - specificity;

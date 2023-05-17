@@ -18,36 +18,28 @@
  */
 package edu.pitt.dbmi.lib.math.classification.plot;
 
+import java.awt.BasicStroke;
+
 /**
  *
- * Oct 26, 2011 4:22:53 PM
+ * May 17, 2023 11:48:57 AM
  *
  * @author Kevin V. Bui (kvb2univpitt@gmail.com)
  */
-public interface XYStatPlot extends Plot {
+public final class PlotLines {
 
-    public boolean isGridLineVisible();
+    public static final BasicStroke DOTTED_LINE = createDottedLine(3.0f);
+    public static final BasicStroke SOLID_LINE = createSolidLine(3.0f);
 
-    public boolean isPlotOutlineVisible();
+    private PlotLines() {
+    }
 
-    public void setTitle(final String title);
+    public static BasicStroke createSolidLine(float width) {
+        return new BasicStroke(width);
+    }
 
-    public String getTitle();
-
-    public void setXAxisLabel(final String label);
-
-    public String getXAxisLabel();
-
-    public void setYAxisLabel(final String label);
-
-    public String getYAxisLabel();
-
-    public void setXAxisRange(final double lower, final double upper);
-
-    public void setYAxisRange(final double lower, final double upper);
-
-    public void setGridLineVisible(final boolean visible);
-
-    public void setPlotOutlineVisible(final boolean visible);
+    public static BasicStroke createDottedLine(float width) {
+        return new BasicStroke(width, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[]{6.0f, 6.0f}, 0.0f);
+    }
 
 }

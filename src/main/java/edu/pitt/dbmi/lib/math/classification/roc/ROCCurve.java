@@ -128,7 +128,7 @@ public class ROCCurve implements ROC {
         for (ObservedPredictedValue observedPredictedValue : observedPredictedValues) {
             if (observedPredictedValue.getPredictedValue() != threshold) {
                 confusionMatrixList.add(
-                        new ConfusionMatrix(falseNegative, falsePositive, trueNegative, truePositive, threshold));
+                        new ConfusionMatrix(truePositive, trueNegative, falsePositive, falseNegative, threshold));
                 threshold = observedPredictedValue.getPredictedValue();
             }
 
@@ -141,7 +141,7 @@ public class ROCCurve implements ROC {
             }
         }
         confusionMatrixList.add(
-                new ConfusionMatrix(falseNegative, falsePositive, trueNegative, truePositive, threshold));
+                new ConfusionMatrix(truePositive, trueNegative, falsePositive, falseNegative, threshold));
 
         return confusionMatrixList.stream()
                 .toArray(ConfusionMatrix[]::new);

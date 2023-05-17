@@ -109,7 +109,7 @@ public class ROCCurveTest {
      */
     @Test
     public void testGetAreaUnderRocCurve() {
-        double expResult = 0.7772167669728639;
+        double expResult = 0.7227832330271359;
         double result = roc.getAreaUnderRocCurve();
 
         Assertions.assertEquals(expResult, result);
