@@ -19,10 +19,10 @@
 package edu.pitt.dbmi.lib.math.classification.roc.plot;
 
 import edu.pitt.dbmi.lib.math.classification.plot.AbstractXYStatPlot;
-import edu.pitt.dbmi.lib.math.classification.plot.PlotShapeFactory;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.util.HashMap;
 import java.util.Map;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
@@ -39,10 +39,7 @@ public abstract class AbstractROCCurvePlot extends AbstractXYStatPlot {
 
     protected XYLineAndShapeRenderer fourtyFiveDegreeLineRenderer;
 
-    protected static final Shape CIRCLE = PlotShapeFactory.createCircle(0.25);
-
     protected XYSeriesCollection pointDataset;
-    protected XYSeriesCollection shapeDataset;
 
     protected XYLineAndShapeRenderer pointRender;
     protected XYLineAndShapeRenderer shapeRender;
@@ -68,15 +65,8 @@ public abstract class AbstractROCCurvePlot extends AbstractXYStatPlot {
         pointDataset = new XYSeriesCollection();
         plot.setDataset(1, pointDataset);
 
-        shapeDataset = new XYSeriesCollection();
-        plot.setDataset(2, shapeDataset);
-
         pointRender = new XYLineAndShapeRenderer();
         plot.setRenderer(1, pointRender);
-
-        shapeRender = new XYLineAndShapeRenderer();
-        shapeRender.setSeriesVisibleInLegend(2, false);
-        plot.setRenderer(2, shapeRender);
 
         dataSeriesMap = new HashMap<String, XYSeries>();
         dataShapeSeriesMap = new HashMap<String, XYSeries>();
@@ -100,7 +90,6 @@ public abstract class AbstractROCCurvePlot extends AbstractXYStatPlot {
         pointRender.setSeriesPaint(pointDataset.indexOf(series), color);
 
         series = dataShapeSeriesMap.get(key);
-        shapeRender.setSeriesPaint(shapeDataset.indexOf(series), color);
     }
 
     public void setDataSeriesVisible(final String key, final boolean flag) {
@@ -108,12 +97,6 @@ public abstract class AbstractROCCurvePlot extends AbstractXYStatPlot {
         pointRender.setSeriesVisible(pointDataset.indexOf(series), flag);
 
         series = dataShapeSeriesMap.get(key);
-        shapeRender.setSeriesVisible(shapeDataset.indexOf(series), flag);
-    }
-
-    public void setDataSeriesShape(final String key, final Shape shape) {
-        XYSeries series = dataShapeSeriesMap.get(key);
-        shapeRender.setSeriesShape(shapeDataset.indexOf(series), shape);
     }
 
     public void setDataSeriesName(final String key, final String name) {
@@ -129,117 +112,19 @@ public abstract class AbstractROCCurvePlot extends AbstractXYStatPlot {
     public void addDataSeries(
             final String key, final String label,
             final double[] xPoints, final double[] yPoints,
-            final Color color, final Shape shape, final BasicStroke line) {
+            final Color color, final Shape shape, final Stroke stroke) {
         // data points
         XYSeries plotDataPoints = createPlotDataPoints(label, xPoints, yPoints);
         pointDataset.addSeries(plotDataPoints);
+
         int seriesIndex = pointDataset.indexOf(plotDataPoints);
         pointRender.setSeriesPaint(seriesIndex, color);
-        pointRender.setSeriesShape(seriesIndex, CIRCLE);
-        pointRender.setSeriesStroke(seriesIndex, line);
-        pointRender.setSeriesVisibleInLegend(seriesIndex, false);
+        pointRender.setSeriesShape(seriesIndex, shape);
+        pointRender.setSeriesStroke(seriesIndex, stroke);
+        pointRender.setSeriesVisibleInLegend(seriesIndex, true);
         dataSeriesMap.put(key, plotDataPoints);
 
-        // data shape points
-        XYSeries plotDataShapPoints = createPlotDataShapePoints(label, xPoints, yPoints);
-        shapeDataset.addSeries(plotDataShapPoints);
-        seriesIndex = shapeDataset.indexOf(plotDataShapPoints);
-        shapeRender.setSeriesShape(seriesIndex, shape);
-        shapeRender.setSeriesPaint(seriesIndex, color);
-        shapeRender.setSeriesLinesVisible(seriesIndex, false);
-        shapeRender.setSeriesVisibleInLegend(seriesIndex, true);
-        dataShapeSeriesMap.put(key, plotDataShapPoints);
-
         chart.fireChartChanged();
-    }
-
-    private XYSeries createPlotDataShapePoints(final String label, final double[] xPoints, final double[] yPoints) {
-        XYSeries series = new XYSeries(label);
-
-        int numOfPoints = xPoints.length;
-        if (numOfPoints <= 10) {
-            for (int i = 0; i < numOfPoints; i++) {
-                series.add(xPoints[i], yPoints[i]);
-            }
-        } else {
-            // the end points
-            double minX = Double.MAX_VALUE;
-            double minY = 0;
-            double maxX = Double.MIN_VALUE;
-            double maxY = 0;
-
-            boolean[] addedInInterval = new boolean[9];
-            for (int i = 0; i < numOfPoints; i++) {
-                double xPoint = xPoints[i];
-
-                // find min endpoints and max endpoints
-                if (xPoint < minX) {
-                    minX = xPoint;
-                    minY = yPoints[i];
-                }
-                if (xPoint > maxX) {
-                    maxX = xPoint;
-                    maxY = yPoints[i];
-                }
-
-                if (xPoint > 0.0 && xPoint <= 0.1) {
-                    if (!addedInInterval[0]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[0] = true;
-                    }
-                } else if (xPoint > 0.1 && xPoint <= 0.2) {
-                    if (!addedInInterval[1]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[1] = true;
-                    }
-                } else if (xPoint > 0.2 && xPoint <= 0.3) {
-                    if (!addedInInterval[2]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[2] = true;
-                    }
-                } else if (xPoint > 0.4 && xPoint <= 0.5) {
-                    if (!addedInInterval[3]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[3] = true;
-                    }
-                } else if (xPoint > 0.5 && xPoint <= 0.6) {
-                    if (!addedInInterval[4]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[4] = true;
-                    }
-                } else if (xPoint > 0.6 && xPoint <= 0.7) {
-                    if (!addedInInterval[5]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[5] = true;
-                    }
-                } else if (xPoint > 0.7 && xPoint <= 0.8) {
-                    if (!addedInInterval[6]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[6] = true;
-                    }
-                } else if (xPoint > 0.8 && xPoint <= 0.9) {
-                    if (!addedInInterval[7]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[7] = true;
-                    }
-                } else if (xPoint > 0.9 && xPoint <= 1.0) {
-                    if (!addedInInterval[8]) {
-                        series.add(xPoints[i], yPoints[i]);
-                        addedInInterval[8] = true;
-                    }
-                }
-            }
-
-            // add end points
-            series.add(minX, minY);
-            series.add(maxX, maxY);
-        }
-
-        // add end points
-        series.add(0.0, 0.0);
-        series.add(1.0, 1.0);
-
-        return series;
     }
 
     private XYSeries createPlotDataPoints(final String label, final double[] xPoints, final double[] yPoints) {
@@ -249,10 +134,6 @@ public abstract class AbstractROCCurvePlot extends AbstractXYStatPlot {
         for (int i = 0; i < xPoints.length; i++) {
             series.add(xPoints[i], yPoints[i]);
         }
-
-        // add end points
-        series.add(0.0, 0.0);
-        series.add(1.0, 1.0);
 
         return series;
     }

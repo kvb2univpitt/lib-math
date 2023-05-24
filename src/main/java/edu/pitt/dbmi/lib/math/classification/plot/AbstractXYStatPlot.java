@@ -34,6 +34,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -66,6 +67,7 @@ public abstract class AbstractXYStatPlot implements XYStatPlot {
         );
         chart.setBackgroundPaint(Color.WHITE); // Set the background colour of the chart
         chart.setAntiAlias(true);
+        chart.setPadding(new RectangleInsets(20, 20, 20, 20));
         setLegend(chart);
 
         // get plot
@@ -79,6 +81,9 @@ public abstract class AbstractXYStatPlot implements XYStatPlot {
         LegendTitle legend = chart.getLegend();
         legend.setItemFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         legend.setPosition(RectangleEdge.BOTTOM);
+        legend.setBorder(1, 1, 1, 1);
+        legend.setItemLabelPadding(new RectangleInsets(2, 5, 2, 20));
+        legend.setPadding(new RectangleInsets(10, 20, 10, 20));
     }
 
     private void setVisual(XYPlot plot) {

@@ -21,8 +21,6 @@ package edu.pitt.dbmi.lib.math.classification.roc.plot;
 import edu.pitt.dbmi.lib.math.classification.data.Delimiters;
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
 import edu.pitt.dbmi.lib.math.classification.plot.PlotColors;
-import edu.pitt.dbmi.lib.math.classification.plot.PlotLines;
-import edu.pitt.dbmi.lib.math.classification.plot.PlotShapes;
 import edu.pitt.dbmi.lib.math.classification.roc.DeLongROCCurve;
 import edu.pitt.dbmi.lib.math.classification.roc.ROC;
 import edu.pitt.dbmi.lib.math.classification.utils.ResourcesLoader;
@@ -51,22 +49,25 @@ public class ROCCurvePlotTest {
      */
     @Test
     public void testSaveImageAsPNG() throws Exception {
-        Path dataFile = Paths.get(ResourcesLoaderTest.class.getResource("/data/data.csv").getFile());
-        Pattern delimiter = Delimiters.COMMA;
-        ObservedPredictedValue[] observedPredictedValues = ResourcesLoader.loadObservedPredictedValues(dataFile, delimiter);
 
-        ROC roc = new DeLongROCCurve(observedPredictedValues);
-
-        String title = "Test ROC Curve Plot";
-        String label = String.format("test-data (AUC=%1.4f)", roc.getAreaUnderRocCurve());
-        ROCCurvePlot rocCurvePlot = new ROCCurvePlot(title);
-        rocCurvePlot.add(roc, "", label, PlotColors.BLUE, PlotShapes.CIRCLE_SHAPE, PlotLines.SOLID_LINE);
+        ROCCurvePlot rocCurvePlot = new ROCCurvePlot("Test ROC Curve Plot");
+        rocCurvePlot.add(getROC("/data/data.csv", Delimiters.COMMA), "", "data", PlotColors.BLUE);
+        rocCurvePlot.add(getROC("/data/data3.csv", Delimiters.COMMA), "", "data3", PlotColors.DARK_ORANGE);
+        rocCurvePlot.add(getROC("/data/data4.csv", Delimiters.COMMA), "", "data4", PlotColors.MAGENTA);
+        rocCurvePlot.add(getROC("/data/edge_data.csv", Delimiters.COMMA), "", "edge_data", PlotColors.DARK_VIOLET);
 
         String dirOut = Files.createDirectory(Paths.get(tempDir.toString(), "plot")).toString();
         File imageFile = Paths.get(dirOut, "chart.png").toFile();
         int width = 800;
         int height = 800;
         rocCurvePlot.saveImageAsPNG(imageFile, width, height);
+    }
+
+    private ROC getROC(String file, Pattern delimiter) throws Exception {
+        Path dataFile = Paths.get(ResourcesLoaderTest.class.getResource(file).getFile());
+        ObservedPredictedValue[] data = ResourcesLoader.loadObservedPredictedValues(dataFile, delimiter);
+
+        return new DeLongROCCurve(data);
     }
 
 }

@@ -18,6 +18,8 @@
  */
 package edu.pitt.dbmi.lib.math.classification.roc.plot;
 
+import edu.pitt.dbmi.lib.math.classification.plot.PlotLines;
+import edu.pitt.dbmi.lib.math.classification.plot.PlotShapeFactory;
 import edu.pitt.dbmi.lib.math.classification.roc.ROC;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -31,20 +33,20 @@ import java.awt.Shape;
  */
 public class ROCCurvePlot extends AbstractROCCurvePlot {
 
-    public ROCCurvePlot() {
-        this("");
-    }
+    private static final Shape SHAPE = PlotShapeFactory.createCircle(0.25);
+    private static final BasicStroke STROKE = PlotLines.SOLID_LINE;
 
     public ROCCurvePlot(String title) {
-        this(title, "1-Specificity (FPR)", "Sensitivity (TPR)");
+        super(title, "1-Specificity (FPR)", "Sensitivity (TPR)");
     }
 
-    public ROCCurvePlot(String title, String xAxisLabel, String yAxisLabel) {
-        super(title, xAxisLabel, yAxisLabel);
-    }
+    public void add(ROC roc, String key, String label, Color color) {
+        label = String.format("%s (AUC %1.4f)", label, roc.getAreaUnderRocCurve());
 
-    public void add(ROC roc, String key, String label, Color color, Shape shape, BasicStroke line) {
-        addDataSeries(key, label, roc.getFalsePositiveRates(), roc.getTruePositiveRates(), color, shape, line);
+        addDataSeries(
+                key, label,
+                roc.getFalsePositiveRates(), roc.getTruePositiveRates(),
+                color, SHAPE, STROKE);
     }
 
 }
