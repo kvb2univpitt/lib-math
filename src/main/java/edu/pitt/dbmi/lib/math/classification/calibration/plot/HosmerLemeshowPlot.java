@@ -18,8 +18,8 @@
  */
 package edu.pitt.dbmi.lib.math.classification.calibration.plot;
 
-import edu.pitt.dbmi.lib.math.classification.plot.AbstractXYStatPlot;
 import edu.pitt.dbmi.lib.math.classification.calibration.HosmerLemeshow;
+import edu.pitt.dbmi.lib.math.classification.plot.AbstractXYStatPlot;
 import java.awt.Color;
 import java.awt.Shape;
 import java.util.HashMap;
@@ -81,11 +81,18 @@ public class HosmerLemeshowPlot extends AbstractXYStatPlot {
         for (int i = 0; i < expectedValues.length; i++) {
             double xValue = expectedValues[i];
             double yValue = observedValues[i];
-            if (xValue > 0 || yValue > 0) {
+            if ((xValue >= 0.0 && xValue <= 1.0) || (yValue >= 0.0 && yValue <= 1.0)) {
+                // no error bars
                 dataSeries.add(xValue, xValue, xValue, yValue, yValue, yValue);
+
+                // has error bars
+                double yLowValue = (marginOfErrorPerGroup[i] == 0)
+                        ? marginOfErrorPerGroup[i] - yValue
+                        : yValue - marginOfErrorPerGroup[i];
+                double yHighValue = yValue + marginOfErrorPerGroup[i];
                 dataErrorBarSeries.add(
                         xValue, xValue, xValue,
-                        yValue, yValue - marginOfErrorPerGroup[i], yValue + marginOfErrorPerGroup[i]);
+                        yValue, yLowValue, yHighValue);
             }
         }
 
