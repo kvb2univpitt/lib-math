@@ -29,6 +29,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -65,9 +66,12 @@ public class ROCCurvePlotTest {
 
     private ROC getROC(String file, Pattern delimiter) throws Exception {
         Path dataFile = Paths.get(ResourcesLoaderTest.class.getResource(file).getFile());
-        ObservedPredictedValue[] data = ResourcesLoader.loadObservedPredictedValues(dataFile, delimiter);
+        int observedColumn = 1;
+        int predictedColumn = 2;
+        boolean hasHeader = false;
+        List<ObservedPredictedValue> observedPredictedValues = ResourcesLoader.loadData(dataFile, delimiter, observedColumn, predictedColumn, hasHeader);
 
-        return new DeLongROCCurve(data);
+        return new DeLongROCCurve(observedPredictedValues);
     }
 
 }

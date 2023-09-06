@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.lib.math.classification.calibration;
 
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
+import java.util.List;
 
 /**
  * Hosmer-Lemeshow calibration chart binning by risk-factor.
@@ -29,7 +30,7 @@ import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
  */
 public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
 
-    public HosmerLemeshowRiskGroup(ObservedPredictedValue[] observedPredictedValues) {
+    public HosmerLemeshowRiskGroup(List<ObservedPredictedValue> observedPredictedValues) {
         super(observedPredictedValues);
     }
 
@@ -47,7 +48,7 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             double predictedValueSum = 0;  // expected number of cases in the jth group (sum of predictions within the interval)
             int numOfData = 0;  // total number of data within the interval
             int numOfPosObserVal = 0;  // observed number of cases in the jth group
-            if (predictedValues[index] < threshold) {
+            if (predictedValues[index] < threshold || threshold > 0.9) {
                 numOfData++;  // number of observations in the jth group
                 predictedValueSum += predictedValues[index];
                 if (observedValues[index] == 1) {
@@ -85,7 +86,11 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
             }
 
             groupNumber++;
-            threshold += increment;
+
+            // prevents threshold from going over 1.0
+            if (threshold < 0.9) {
+                threshold += increment;
+            }
         }
     }
 
@@ -104,18 +109,22 @@ public class HosmerLemeshowRiskGroup extends AbstractHosmerLemeshow {
         int size = predictedValues.length;
         int index = 0;
         while (index < size) {
-            // check if the data falls within current threshold (bin)
-            if (predictedValues[index] < threshold) {
+            // check if the data falls below current threshold (bin)
+            // or if predicted value is between 0.9 and 1.0, inclusive
+            if (predictedValues[index] < threshold || threshold > 0.9) {
                 numOfGroups++;
 
                 // skip all the data that already falls in the current threshold (bin)
                 index++;
-                for (int j = index; j < predictedValues.length && (predictedValues[j] < threshold || threshold > 0.9); j++) {
+                for (int j = index; (j < predictedValues.length) && (predictedValues[j] < threshold); j++) {
                     index++;
                 }
             }
 
-            threshold += increment;
+            // prevents threshold from going over 1.0
+            if (threshold < 0.9) {
+                threshold += increment;
+            }
         }
 
         return numOfGroups;

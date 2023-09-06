@@ -19,6 +19,7 @@
 package edu.pitt.dbmi.lib.math.classification.calibration;
 
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
+import java.util.List;
 
 /**
  * Hosmer-Lemeshow calibration chart binning by decile, splitting the dataset
@@ -30,7 +31,7 @@ import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
  */
 public class HosmerLemeshowDecileGroup extends AbstractHosmerLemeshow {
 
-    public HosmerLemeshowDecileGroup(ObservedPredictedValue[] observedPredictedValues) {
+    public HosmerLemeshowDecileGroup(List<ObservedPredictedValue> observedPredictedValues) {
         super(observedPredictedValues);
     }
 

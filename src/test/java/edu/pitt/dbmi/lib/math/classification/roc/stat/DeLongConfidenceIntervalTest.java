@@ -26,6 +26,7 @@ import edu.pitt.dbmi.lib.math.classification.utils.ResourcesLoaderTest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,7 +46,11 @@ public class DeLongConfidenceIntervalTest {
     public static void setUpClass() throws IOException {
         Path file = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.csv").getFile());
         Pattern delimiter = Delimiters.COMMA;
-        ObservedPredictedValue[] observedPredictedValues = ResourcesLoader.loadObservedPredictedValues(file, delimiter);
+        int observedColumn = 1;
+        int predictedColumn = 2;
+        boolean hasHeader = false;
+        List<ObservedPredictedValue> observedPredictedValues = ResourcesLoader.loadData(file, delimiter, observedColumn, predictedColumn, hasHeader);
+
         DeLongROCCurve deLongROCCurve = new DeLongROCCurve(observedPredictedValues);
 
         confidenceInterval = new DeLongConfidenceInterval(deLongROCCurve);

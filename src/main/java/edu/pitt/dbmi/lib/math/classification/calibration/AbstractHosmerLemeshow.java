@@ -20,6 +20,7 @@ package edu.pitt.dbmi.lib.math.classification.calibration;
 
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 
 /**
@@ -111,25 +112,25 @@ public abstract class AbstractHosmerLemeshow implements HosmerLemeshow {
      */
     protected double averageCalibrationError;
 
-    public AbstractHosmerLemeshow(ObservedPredictedValue[] observedPredictedValues) {
-        if (observedPredictedValues == null || observedPredictedValues.length == 0) {
-            throw new IllegalArgumentException("Observed values and predicted values are required.");
+    public AbstractHosmerLemeshow(List<ObservedPredictedValue> observedPredictedValues) {
+        if (observedPredictedValues == null || observedPredictedValues.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "A list of data containing both observed value and predicted value is required.");
         }
 
-        // copy the array
-        observedPredictedValues = Arrays.stream(observedPredictedValues)
-                .toArray(ObservedPredictedValue[]::new);
+        // copy data to an array
+        ObservedPredictedValue[] data = observedPredictedValues.toArray(ObservedPredictedValue[]::new);
 
         // sort in ascending order
-        Arrays.sort(observedPredictedValues);
+        Arrays.sort(data);
 
-        numberOfPredictions = observedPredictedValues.length;
+        numberOfPredictions = data.length;
 
         // populate observed values and predicted values
         observedValues = new int[numberOfPredictions];
         predictedValues = new double[numberOfPredictions];
-        for (int i = 0; i < observedPredictedValues.length; i++) {
-            ObservedPredictedValue obsPredVal = observedPredictedValues[i];
+        for (int i = 0; i < numberOfPredictions; i++) {
+            ObservedPredictedValue obsPredVal = data[i];
             observedValues[i] = obsPredVal.getObservedValue();
             predictedValues[i] = obsPredVal.getPredictedValue();
         }

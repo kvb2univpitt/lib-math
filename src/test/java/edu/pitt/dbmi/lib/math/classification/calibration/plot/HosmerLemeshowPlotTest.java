@@ -30,6 +30,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,7 +53,11 @@ public class HosmerLemeshowPlotTest {
     public void testSaveImageAsPNG() throws Exception {
         Path dataFile = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.csv").getFile());
         Pattern delimiter = Delimiters.COMMA;
-        ObservedPredictedValue[] observedPredictedValues = ResourcesLoader.loadObservedPredictedValues(dataFile, delimiter);
+        int observedColumn = 1;
+        int predictedColumn = 2;
+        boolean hasHeader = false;
+        List<ObservedPredictedValue> observedPredictedValues = ResourcesLoader.loadData(dataFile, delimiter, observedColumn, predictedColumn, hasHeader);
+
         HosmerLemeshow hl = new HosmerLemeshowRiskGroup(observedPredictedValues);
 
         String title = "Hosmer Lemeshow Chart";

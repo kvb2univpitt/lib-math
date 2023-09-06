@@ -22,6 +22,7 @@ import edu.pitt.dbmi.lib.math.classification.data.Delimiters;
 import edu.pitt.dbmi.lib.math.classification.data.ObservedPredictedValue;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,10 +42,12 @@ public class ResourcesLoaderTest {
     public void testLoadObservedPredictedValues() throws Exception {
         Path file = Paths.get(ResourcesLoaderTest.class.getResource("/data/obs_pred_vals.csv").getFile());
         Pattern delimiter = Delimiters.COMMA;
+        int observedColumn = 1;
+        int predictedColumn = 2;
+        boolean hasHeader = false;
+        List<ObservedPredictedValue> observedPredictedValues = ResourcesLoader.loadData(file, delimiter, observedColumn, predictedColumn, hasHeader);
 
-        ObservedPredictedValue[] values = ResourcesLoader.loadObservedPredictedValues(file, delimiter);
-
-        int result = values.length;
+        int result = observedPredictedValues.size();
         int expResult = 1411;
         Assertions.assertEquals(expResult, result);
     }

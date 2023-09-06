@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -39,10 +40,27 @@ public final class ResourcesLoader {
     private ResourcesLoader() {
     }
 
-    public static ObservedPredictedValue[] loadObservedPredictedValues(Path file, Pattern delimiter) throws IOException {
-        List<ObservedPredictedValue> values = new LinkedList<>();
+    /**
+     * Read in observed values and predicted values from a file.
+     *
+     * @param file containing a column of observed values and a column of
+     * predicted values
+     * @param delimiter a character that is used to separate data
+     * @param observedColumn the number of the column containing observed values
+     * @param predictedColumn the number of the column containing predicted
+     * values
+     * @param hasHeader true if the first line of the file is the header
+     * @return a list of observed values and their corresponding predicted
+     * values
+     * @throws IOException
+     */
+    public static List<ObservedPredictedValue> loadData(Path file, Pattern delimiter, int observedColumn, int predictedColumn, boolean hasHeader) throws IOException {
+        List<ObservedPredictedValue> data = new LinkedList<>();
 
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            int observedIndex = observedColumn - 1;
+            int predictedIndex = predictedColumn - 1;
+            int maxColumn = Integer.max(observedColumn, predictedColumn);
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 line = line.trim();
 
@@ -51,16 +69,22 @@ public final class ResourcesLoader {
                     continue;
                 }
 
+                // skip header
+                if (hasHeader) {
+                    hasHeader = false;
+                    continue;
+                }
+
                 String[] fields = delimiter.split(line.trim());
-                if (fields.length == 2) {
-                    values.add(new ObservedPredictedValue(
-                            Integer.parseInt(fields[0]),
-                            Double.parseDouble(fields[1])));
+                if (fields.length >= maxColumn) {
+                    data.add(new ObservedPredictedValue(
+                            Integer.parseInt(fields[observedIndex]),
+                            Double.parseDouble(fields[predictedIndex])));
                 }
             }
         }
 
-        return values.stream().toArray(ObservedPredictedValue[]::new);
+        return Collections.unmodifiableList(data);
     }
 
 }

@@ -55,36 +55,36 @@ public class ROCCurve implements ROC {
 
     private double areaUnderRocCurve;
 
-    public ROCCurve(ObservedPredictedValue[] observedPredictedValues) {
-        if (observedPredictedValues == null || observedPredictedValues.length == 0) {
-            throw new IllegalArgumentException("Observed values and predicted values are required.");
+    public ROCCurve(List<ObservedPredictedValue> observedPredictedValues) {
+        if (observedPredictedValues == null || observedPredictedValues.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "A list of data containing both observed value and predicted value is required.");
         }
 
-        // copy the array
-        observedPredictedValues = Arrays.stream(observedPredictedValues)
-                .toArray(ObservedPredictedValue[]::new);
+        // copy data to an array
+        ObservedPredictedValue[] data = observedPredictedValues.toArray(ObservedPredictedValue[]::new);
 
         // sort in descending order
-        Arrays.sort(observedPredictedValues, Collections.reverseOrder());
+        Arrays.sort(data, Collections.reverseOrder());
 
-        this.numberOfPositives = (int) Arrays.stream(observedPredictedValues)
+        this.numberOfPositives = (int) Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
                 .count();
-        this.numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
+        this.numberOfNegatives = (int) Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .count();
 
         // seperate the values for the positive and negative outcomes
-        positivePredictedValues = Arrays.stream(observedPredictedValues)
+        positivePredictedValues = Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
                 .mapToDouble(obsPredVal -> obsPredVal.getPredictedValue())
                 .toArray();
-        negativePredictedValues = Arrays.stream(observedPredictedValues)
+        negativePredictedValues = Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .mapToDouble(obsPredVal -> obsPredVal.getPredictedValue())
                 .toArray();
 
-        this.confusionMatrices = computeConfusionMatrices(observedPredictedValues, numberOfPositives, numberOfNegatives);
+        this.confusionMatrices = computeConfusionMatrices(data, numberOfPositives, numberOfNegatives);
 
         this.areaUnderRocCurve = computeAreaUnderRocCurve(confusionMatrices);
 

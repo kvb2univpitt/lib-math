@@ -55,40 +55,40 @@ public class DeLongROCCurve implements ROC {
 
     private double areaUnderRocCurve;
 
-    public DeLongROCCurve(ObservedPredictedValue[] observedPredictedValues) {
-        if (observedPredictedValues == null || observedPredictedValues.length == 0) {
-            throw new IllegalArgumentException("Observed values and predicted values are required.");
+    public DeLongROCCurve(List<ObservedPredictedValue> observedPredictedValues) {
+        if (observedPredictedValues == null || observedPredictedValues.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "A list of data containing both observed value and predicted value is required.");
         }
 
-        // copy the array
-        observedPredictedValues = Arrays.stream(observedPredictedValues)
-                .toArray(ObservedPredictedValue[]::new);
+        // copy data to an array
+        ObservedPredictedValue[] data = observedPredictedValues.toArray(ObservedPredictedValue[]::new);
 
         // sort in descending order
-        Arrays.sort(observedPredictedValues, Collections.reverseOrder());
+        Arrays.sort(data, Collections.reverseOrder());
 
-        numberOfPositives = (int) Arrays.stream(observedPredictedValues)
+        numberOfPositives = (int) Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
                 .count();
-        numberOfNegatives = (int) Arrays.stream(observedPredictedValues)
+        numberOfNegatives = (int) Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .count();
 
         // seperate the values for the positive and negative outcomes
-        positivePredictedValues = Arrays.stream(observedPredictedValues)
+        positivePredictedValues = Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 1)
                 .mapToDouble(obsPredVal -> obsPredVal.getPredictedValue())
                 .toArray();
-        negativePredictedValues = Arrays.stream(observedPredictedValues)
+        negativePredictedValues = Arrays.stream(data)
                 .filter(obsPredVal -> obsPredVal.getObservedValue() == 0)
                 .mapToDouble(obsPredVal -> obsPredVal.getPredictedValue())
                 .toArray();
 
-        truePositiveRates = new double[observedPredictedValues.length];
-        falsePositiveRates = new double[observedPredictedValues.length];
+        truePositiveRates = new double[data.length];
+        falsePositiveRates = new double[data.length];
 
         confusionMatrices = computeConfusionMatrices(
-                observedPredictedValues,
+                data,
                 numberOfPositives, numberOfNegatives,
                 truePositiveRates, falsePositiveRates,
                 positivePredictedValues, negativePredictedValues);
@@ -97,14 +97,14 @@ public class DeLongROCCurve implements ROC {
     }
 
     private ConfusionMatrix[] computeConfusionMatrices(
-            ObservedPredictedValue[] observedPredictedValues,
+            ObservedPredictedValue[] data,
             int numberOfPositives, int numberOfNegatives,
             double[] truePositiveRates, double[] falsePositiveRates,
             double[] positivePredictedValues, double[] negativePredictedValues) {
         List<ConfusionMatrix> confusionMatrixList = new LinkedList<>();
 
         int index = 0;
-        for (ObservedPredictedValue observedPredictedValue : observedPredictedValues) {
+        for (ObservedPredictedValue observedPredictedValue : data) {
             double z = observedPredictedValue.getPredictedValue();
             double sensitivity = sens(z, positivePredictedValues);
             double specificity = spec(z, negativePredictedValues);
